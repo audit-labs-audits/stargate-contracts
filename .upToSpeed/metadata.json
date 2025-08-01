@@ -13,7 +13,7 @@
     "3.4: StargateNFT: Utilities",
     "4.1: Want to learn more?"
   ],
-  "totalNumberOfSteps": 106,
+  "totalNumberOfSteps": 109,
   "filesCovered": [
     "packages/contracts/contracts/StargateProxy.sol",
     "packages/contracts/contracts/StargateNFT/StargateNFT.sol",

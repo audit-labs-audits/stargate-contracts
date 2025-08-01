@@ -16,7 +16,7 @@
     },
     {
       "type": "highlight",
-      "description": "The `StargateNFTStorage` struct holds the state for the entire contract. This is a common pattern in upgradeable contracts (known as the **Diamond Storage pattern**) to avoid storage collisions between different facets (implementations).\n\nHere's a breakdown of its fields:\n- `vthoGenerationEndTimestamp`: A `uint48` that stores the timestamp when VTHO generation for staked VET will cease.\n- `MAX_LEVEL_ID`: A `uint8` indicating the highest possible level ID for an NFT.\n- `legacyNodes`: An `ITokenAuction` interface, pointing to the legacy node contract for migration purposes.\n- `stargateDelegation`: An `IStargateDelegation` interface, pointing to the contract that handles delegation and rewards.\n- `vthoToken`: An `IERC20` interface for the VTHO token contract.\n- `currentTokenId`: A `uint256` that tracks the next available token ID to be minted.\n- `baseTokenURI`: A `string` that forms the base for the metadata URI of each NFT.\n- `levels`: A mapping from a `uint8` level ID to a `Level` struct, containing details about each NFT level.\n- `circulatingSupply`: A mapping from a `uint8` level ID to `Checkpoints.Trace208`, which tracks the historical circulating supply of NFTs for that level.\n- `cap`: A mapping from a `uint8` level ID to a `uint32`, defining the maximum number of NFTs that can exist at that level.\n- `tokens`: A mapping from a `uint256` token ID to a `Token` struct, holding the data for each individual NFT.\n- `maturityPeriodEndBlock`: A mapping from a `uint256` token ID to a `uint64`, storing the block number at which the NFT's maturity period ends.",
+      "description": "The `StargateNFTStorage` struct holds the state for the contract. This layout follows the Diamond Storage pattern, isolating storage from logic to avoid collisions between facets.\n\nThe following steps dissect its fields in logical groups.",
       "file": "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
       "highlight": [
         {
@@ -26,6 +26,62 @@
       ],
       "title": "",
       "id": "71598",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "These initial fields define configuration and external dependencies.\n\n- `vthoGenerationEndTimestamp` (line 25): Timestamp when VTHO rewards stop.\n- `MAX_LEVEL_ID` (line 26): Highest level ID allowed.\n- `legacyNodes` (line 27): `ITokenAuction` interface for migration.\n- `stargateDelegation` (line 28): `IStargateDelegation` interface for rewards.\n- `vthoToken` (line 29): `IERC20` interface for the VTHO token.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
+      "highlight": [
+        {
+          "start": 25,
+          "end": 29
+        }
+      ],
+      "title": "",
+      "id": "72183",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "These fields handle NFT ID generation and metadata URI.\n\n- `currentTokenId` (line 30): Next token ID to mint.\n- `baseTokenURI` (line 31): Base URL for each token's metadata.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
+      "highlight": [
+        {
+          "start": 30,
+          "end": 31
+        }
+      ],
+      "title": "",
+      "id": "72184",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "These mappings store data per NFT level.\n\n- `levels` (line 32): Maps `levelId` to a `Level` struct.\n- `circulatingSupply` (line 33): Tracks supply history via `Checkpoints.Trace208`.\n- `cap` (line 34): Defines max NFTs per level.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
+      "highlight": [
+        {
+          "start": 32,
+          "end": 34
+        }
+      ],
+      "title": "",
+      "id": "72185",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "These mappings hold data for each NFT token.\n\n- `tokens` (line 35): Maps `tokenId` to a `Token` struct.\n- `maturityPeriodEndBlock` (line 36): Records the block when maturity ends.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
+      "highlight": [
+        {
+          "start": 35,
+          "end": 36
+        }
+      ],
+      "title": "",
+      "id": "72186",
       "hideAreas": []
     },
     {
@@ -55,21 +111,6 @@
       "title": "",
       "id": "71600",
       "hideAreas": []
-    },
-    {
-      "type": "mcq",
-      "description": "To retrieve the `scaledRewardFactor` for a specific NFT with a known `tokenId`, what is the correct data access path within the `StargateNFTStorage` struct ($)?\n\nOptions:\n\n A). $.tokens[tokenId].scaledRewardFactor\n\nB). $.levels[tokenId].scaledRewardFactor\n\nC). $.levels[$.tokens[tokenId].levelId].scaledRewardFactor\n\nD). $.circulatingSupply[$.tokens[tokenId].levelId].scaledRewardFactor\n\n\nCorrect: C). $.levels[$.tokens[tokenId].levelId].scaledRewardFactor\n\nExplanation: The correct path is `$.levels[$.tokens[tokenId].levelId].scaledRewardFactor`. First, the `Token` struct is retrieved from the `tokens` mapping using the `tokenId`. This struct contains the `levelId`. Second, the `Level` struct is retrieved from the `levels` mapping using this `levelId`. The `Level` struct contains the `scaledRewardFactor`. The other options are incorrect because `Token` does not directly store `scaledRewardFactor`, `levels` is keyed by `levelId` not `tokenId`, and `circulatingSupply` tracks supply, not level properties.",
-      "title": "",
-      "id": "71604",
-      "text": "To retrieve the `scaledRewardFactor` for a specific NFT with a known `tokenId`, what is the correct data access path within the `StargateNFTStorage` struct ($)?",
-      "answers": [
-        "$.tokens[tokenId].scaledRewardFactor",
-        "$.levels[tokenId].scaledRewardFactor",
-        "$.levels[$.tokens[tokenId].levelId].scaledRewardFactor",
-        "$.circulatingSupply[$.tokens[tokenId].levelId].scaledRewardFactor"
-      ],
-      "correct": 2,
-      "explanation": "The correct path is `$.levels[$.tokens[tokenId].levelId].scaledRewardFactor`. First, the `Token` struct is retrieved from the `tokens` mapping using the `tokenId`. This struct contains the `levelId`. Second, the `Level` struct is retrieved from the `levels` mapping using this `levelId`. The `Level` struct contains the `scaledRewardFactor`. The other options are incorrect because `Token` does not directly store `scaledRewardFactor`, `levels` is keyed by `levelId` not `tokenId`, and `circulatingSupply` tracks supply, not level properties."
     },
     {
       "type": "highlight",
