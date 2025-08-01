@@ -1,0 +1,125 @@
+{
+  "title": "2.3: StargateNFT: NFT Levels",
+  "id": "/nu3+BnaG2AA0yqjzbb66UKdDXGfHCqbtJSNsHuh9e0=",
+  "originalId": 5704,
+  "position": 4,
+  "steps": [
+    {
+      "type": "textOnly",
+      "description": "Welcome to our tour of the `Levels.sol` library, a core component of the `StargateNFT` contract responsible for managing the various tiers of **NFTs**. This library provides the necessary functions to create, update, and query the different **NFT** levels available in the system.",
+      "title": "",
+      "id": "71588"
+    },
+    {
+      "type": "revealFiles",
+      "files": [
+        "packages/contracts/contracts/StargateNFT/libraries/Levels.sol"
+      ],
+      "description": "Here's an overview of the `Levels.sol` file. The **library** is designed to manage the configuration of different NFT levels.",
+      "title": "",
+      "id": "71589",
+      "hideAreas": []
+    },
+    {
+      "type": "revealFiles",
+      "files": [
+        "packages/contracts/contracts/StargateNFT/libraries/Levels.sol"
+      ],
+      "description": "The `addLevel` function is used to introduce new NFT levels into the system. It takes a `DataTypes.LevelAndSupply` struct as input, which contains all the necessary information for the new level, such as its name, maturity period, and staking requirements.\n\nAn important detail is that the function assigns a new, sequential ID to the level, overriding any ID provided in the input struct. This ensures that level IDs are always consecutive. After performing validation checks, the new level's configuration is stored in the `levels` mapping within `StargateNFTStorage`.",
+      "title": "",
+      "id": "71590",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Here is the code for the `addLevel` function. Notice on line 84 how the level ID from the input is overridden. On line 95, the new level is stored in the `levels` mapping.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Levels.sol",
+      "highlight": [
+        {
+          "start": 76,
+          "end": 113
+        }
+      ],
+      "title": "",
+      "id": "71591",
+      "hideAreas": []
+    },
+    {
+      "type": "mcq",
+      "description": "When an operator calls `Levels.addLevel()` with a `DataTypes.LevelAndSupply` struct where `level.id` is set to `5`, what will be the ID of the newly created level, assuming the current `MAX_LEVEL_ID` is `3`?\n\nOptions:\n\n A). 5, because the function uses the ID provided in the input struct.\n\nB). 4, because `MAX_LEVEL_ID` is incremented and then assigned as the new ID.\n\nC). 3, because the new ID is assigned the value of `MAX_LEVEL_ID` before it is incremented.\n\nD). The transaction will revert because the provided ID is not sequential.\n\n\nCorrect: B). 4, because `MAX_LEVEL_ID` is incremented and then assigned as the new ID.\n\nExplanation: The correct answer is 4. The `addLevel` function first increments `$.MAX_LEVEL_ID` from 3 to 4. It then explicitly overrides any ID provided in the input struct and assigns this new value (4) to the level's ID. The function is designed to ignore the input ID to ensure all level IDs are sequential.",
+      "title": "",
+      "id": "71603",
+      "text": "When an operator calls `Levels.addLevel()` with a `DataTypes.LevelAndSupply` struct where `level.id` is set to `5`, what will be the ID of the newly created level, assuming the current `MAX_LEVEL_ID` is `3`?",
+      "answers": [
+        "5, because the function uses the ID provided in the input struct.",
+        "4, because `MAX_LEVEL_ID` is incremented and then assigned as the new ID.",
+        "3, because the new ID is assigned the value of `MAX_LEVEL_ID` before it is incremented.",
+        "The transaction will revert because the provided ID is not sequential."
+      ],
+      "correct": 1,
+      "explanation": "The correct answer is 4. The `addLevel` function first increments `$.MAX_LEVEL_ID` from 3 to 4. It then explicitly overrides any ID provided in the input struct and assigns this new value (4) to the level's ID. The function is designed to ignore the input ID to ensure all level IDs are sequential."
+    },
+    {
+      "type": "highlight",
+      "description": "The `updateLevel` function allows an operator to modify the properties of an existing NFT level. This function takes the `levelId` and the new values for the level's properties as parameters. It first checks if the level exists and then updates its attributes. This function is critical for maintaining the system and adjusting level properties as needed.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Levels.sol",
+      "highlight": [
+        {
+          "start": 130,
+          "end": 148
+        }
+      ],
+      "title": "",
+      "id": "71592",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The library includes helper functions to query level information. `_levelExists` is an internal view function that checks if a level with a given ID is valid by checking if the `_levelId` is greater than 0 and less than or equal to `$.MAX_LEVEL_ID`.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Levels.sol",
+      "highlight": [
+        {
+          "start": 376,
+          "end": 382
+        }
+      ],
+      "title": "",
+      "id": "71593",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Similarly, `getLevel` is an external view function that returns the complete `DataTypes.Level` struct for a given `_levelId`. This allows other parts of the codebase to easily access all the details of a specific level, including whether it is an **X Level** via the `isX` boolean property within the struct.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Levels.sol",
+      "highlight": [
+        {
+          "start": 174,
+          "end": 179
+        }
+      ],
+      "title": "",
+      "id": "71594",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Finally, the `updateLevelCap` function (referred to as `setCap` in the query) allows an operator to set the maximum supply for a given NFT level. It takes the `_levelId` and the new `_cap` as parameters. Before updating, it validates that the new cap is not less than the current circulating supply to prevent inconsistencies. This controls the scarcity of each NFT level.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Levels.sol",
+      "highlight": [
+        {
+          "start": 155,
+          "end": 161
+        }
+      ],
+      "title": "",
+      "id": "71595",
+      "hideAreas": []
+    },
+    {
+      "type": "textOnly",
+      "description": "This concludes our tour of the `Levels.sol` library. You now have a comprehensive understanding of how NFT levels are created, updated, and managed in the `StargateNFT` contract.",
+      "title": "",
+      "id": "71596"
+    }
+  ]
+}

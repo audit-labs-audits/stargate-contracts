@@ -1,0 +1,200 @@
+{
+  "title": "3.4: StargateNFT: Utilities",
+  "id": "cgPTSKIyTvuHuVf1/ojM4Cjk74Ge5pF2XJyVrX0ep0g=",
+  "originalId": 5708,
+  "position": 8,
+  "steps": [
+    {
+      "type": "textOnly",
+      "description": "Let's complete our `StargateNFT` walkthrough by exploring the remaining utility libraries that support the core functionality.",
+      "title": "",
+      "id": "71661"
+    },
+    {
+      "type": "revealFiles",
+      "files": [
+        "packages/contracts/contracts/StargateNFT/libraries/Settings.sol"
+      ],
+      "description": "The `Settings` library manages contract configuration and state. It provides functions to update critical contract addresses and parameters while maintaining proper access control.",
+      "title": "",
+      "id": "71662",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The storage slot is defined in the main `StargateNFT` contract to prevent storage collisions. The `StargateNFTStorageLocation` constant uses a deterministic hash to ensure a unique storage position, following the **EIP-1967** pattern for upgradeable contracts.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 79,
+          "end": 91
+        }
+      ],
+      "title": "",
+      "id": "71663",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "All Settings functions operate on this `StargateNFTStorage` struct, which contains the contract's core state including token tracking, level management, and external contract references.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
+      "highlight": [
+        {
+          "start": 24,
+          "end": 37
+        }
+      ],
+      "title": "",
+      "id": "71664",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Each `settings function` follows the same pattern: validate input parameters, emit appropriate events for transparency, and update the storage struct. This ensures all configuration changes are properly tracked and auditable.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Settings.sol",
+      "highlight": [
+        {
+          "start": 59,
+          "end": 66
+        }
+      ],
+      "title": "",
+      "id": "71665",
+      "hideAreas": []
+    },
+    {
+      "type": "revealFiles",
+      "files": [
+        "packages/contracts/contracts/StargateNFT/libraries/Errors.sol"
+      ],
+      "description": "The **`Errors`** library centralizes all custom error definitions used throughout the StargateNFT system. **Custom errors** are more gas-efficient than traditional `require` strings and provide more detailed error handling.",
+      "title": "",
+      "id": "71666",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Using custom errors is more gas-efficient than `require` statements with string messages. As you can see in the highlighted code, they can also include parameters to provide debugging information, like the specific `tokenId` or `levelId` that caused the error.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Errors.sol",
+      "highlight": [
+        {
+          "start": 34,
+          "end": 50
+        }
+      ],
+      "title": "",
+      "id": "71667",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Here's an example of how the `VetAmountMismatch` error is used in `MintingLogic.sol`. When staking doesn't provide the exact VET amount required for a level, this custom error clearly indicates what was expected versus what was provided.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/MintingLogic.sol",
+      "highlight": [
+        {
+          "start": 188,
+          "end": 190
+        }
+      ],
+      "title": "",
+      "id": "71668",
+      "hideAreas": []
+    },
+    {
+      "type": "mcq",
+      "description": "What is the primary architectural advantage of using custom errors defined in `Errors.sol` over traditional `require()` statements with string messages?\n\nOptions:\n\n A). It improves code readability by separating error definitions from business logic.\n\nB). It reduces deployment and runtime gas costs while enabling parameterized error reporting.\n\nC). It allows error messages to be updated on-chain without redeploying the contract.\n\n\nCorrect: B). It reduces deployment and runtime gas costs while enabling parameterized error reporting.\n\nExplanation: The correct answer is that custom errors are more gas-efficient than `require()` strings for both deployment and runtime execution. They also allow passing parameters (e.g., `TokenDoesNotExist(tokenId)`), which provides more context for debugging off-chain. While separating errors does improve readability, the gas and data benefits are the primary engineering driver for this pattern. Error messages are part of the contract's bytecode and cannot be changed post-deployment.",
+      "title": "",
+      "id": "71677",
+      "text": "What is the primary architectural advantage of using custom errors defined in `Errors.sol` over traditional `require()` statements with string messages?",
+      "answers": [
+        "It improves code readability by separating error definitions from business logic.",
+        "It reduces deployment and runtime gas costs while enabling parameterized error reporting.",
+        "It allows error messages to be updated on-chain without redeploying the contract."
+      ],
+      "correct": 1,
+      "explanation": "The correct answer is that custom errors are more gas-efficient than `require()` strings for both deployment and runtime execution. They also allow passing parameters (e.g., `TokenDoesNotExist(tokenId)`), which provides more context for debugging off-chain. While separating errors does improve readability, the gas and data benefits are the primary engineering driver for this pattern. Error messages are part of the contract's bytecode and cannot be changed post-deployment."
+    },
+    {
+      "type": "revealFiles",
+      "files": [
+        "packages/contracts/contracts/StargateNFT/libraries/Token.sol"
+      ],
+      "description": "The `Token` library provides comprehensive helper functions for working with the `Token` struct and managing token-related operations like ownership checks, metadata retrieval, and token classification.",
+      "title": "",
+      "id": "71669",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The `getToken` function is a simple getter that retrieves token data from storage after validating the token exists. It demonstrates the **library**'s role in providing clean, reusable access patterns.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Token.sol",
+      "highlight": [
+        {
+          "start": 281,
+          "end": 286
+        }
+      ],
+      "title": "",
+      "id": "71670",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Functions like `ownsXToken` show how the `library` provides semantic ownership checks. Rather than exposing internal token iteration logic, it provides clean boolean functions that abstract the complexity.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Token.sol",
+      "highlight": [
+        {
+          "start": 232,
+          "end": 237
+        }
+      ],
+      "title": "",
+      "id": "71671",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The library also provides batch operations like `tokensOwnedBy`, which efficiently retrieves all tokens owned by an address. This eliminates the need for multiple external calls and provides a cleaner API for front-end applications.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Token.sol",
+      "highlight": [
+        {
+          "start": 139,
+          "end": 149
+        }
+      ],
+      "title": "",
+      "id": "71672",
+      "hideAreas": []
+    },
+    {
+      "type": "revealFiles",
+      "files": [
+        "packages/contracts/contracts/StargateNFT/libraries/Clock.sol"
+      ],
+      "description": "The `Clock` library is a simple utility that abstracts block number and timestamp access. This abstraction layer makes the code more testable and provides a consistent interface across the system.",
+      "title": "",
+      "id": "71673",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The `_clock()` function wraps `OpenZeppelin`'s `Time.blockNumber()`, providing a consistent way to access the current block number throughout the codebase. This abstraction makes testing easier and provides a single point of control for time-related operations.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Clock.sol",
+      "highlight": [
+        {
+          "start": 45,
+          "end": 47
+        }
+      ],
+      "title": "",
+      "id": "71674",
+      "hideAreas": []
+    },
+    {
+      "type": "textOnly",
+      "description": "These utility libraries demonstrate several architectural patterns: centralized configuration management, custom errors for gas efficiency, semantic helper functions, and abstracted system calls. Together, they provide the foundation for the `StargateNFT` contract and contribute to its gas efficiency.",
+      "title": "",
+      "id": "71675"
+    }
+  ]
+}

@@ -1,0 +1,345 @@
+{
+  "title": "3.3: StargateNFT: The Main Contract",
+  "id": "RhRqb2gZao827AYFKZnPJxjt1wta0kd7DwBMuJwt8TQ=",
+  "originalId": 5700,
+  "position": 7,
+  "steps": [
+    {
+      "type": "highlight",
+      "description": "This contract transforms `VET` staking into tradeable, upgradeable **NFTs**—hard-staking positions represented as `ERC-721` tokens. By minting **NFTs** for each stake, users gain composability and liquidity: positions can be sold or transferred while preserving accrued rewards.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 35,
+          "end": 46
+        }
+      ],
+      "title": "",
+      "id": "71717",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "All state lives in one struct: `StargateNFTStorage`. Passing it into **libraries** centralizes data, keeps the main contract under size limits, and optimizes gas—**libraries** are deployed once and reused across calls.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
+      "highlight": [
+        {
+          "start": 24,
+          "end": 37
+        }
+      ],
+      "title": "",
+      "id": "71718",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "`_getStargateNFTStorage()` uses an assembly slot to fetch the storage struct. Every public function follows: retrieve storage, apply modifiers, then delegate to a library—cleanly separating concerns.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 83,
+          "end": 91
+        }
+      ],
+      "title": "",
+      "id": "71719",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "`stake(_levelId)`: retrieves storage (line 329) and delegates to `MintingLogic.stake()`. This library handles all validation, `VET` transfers, token ID generation, and event emission—keeping on-chain logic modular and testable.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 326,
+          "end": 331
+        }
+      ],
+      "title": "",
+      "id": "71720",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "`unstake(tokenId)`: mirrors `stake()` by calling `MintingLogic.unstake()`. The **library** burns the **NFT**, returns **VET**, and updates **circulating supply**—errors in business logic stay confined to the **library**.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 373,
+          "end": 377
+        }
+      ],
+      "title": "",
+      "id": "71721",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "`migrate(tokenId)`: evolves legacy `TokenAuction` positions into new NFTs. The library validates legacy state, destroys old tokens, and mints new ones—enabling protocol upgrades.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 351,
+          "end": 355
+        }
+      ],
+      "title": "",
+      "id": "71722",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "`addLevel(levelAndSupply)`: only `LEVEL_OPERATOR_ROLE` can call. Delegates to `Levels.addLevel()`, which updates level metadata, caps, and emits events—ensuring governance over new staking tiers.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 219,
+          "end": 223
+        }
+      ],
+      "title": "",
+      "id": "71723",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "`updateLevel(...)`: similar pattern with multiple parameters. Only operators can adjust maturity periods, reward multipliers, and stake requirements—critical for tuning protocol economics without redeploying.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 237,
+          "end": 254
+        }
+      ],
+      "title": "",
+      "id": "71724",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "**Naming note**: Query refers to `claimRewards`, but `StargateNFT` uses `claimVetGeneratedVtho()`. This distinguishes base VTHO rewards (pre-Hayabusa) from delegation rewards. It retrieves storage (line 383) then calls `VetGeneratedVtho.claimRewards()`.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 382,
+          "end": 386
+        }
+      ],
+      "title": "",
+      "id": "71725",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "`canTransfer(tokenId)` checks delegation state via `StargateDelegation`. Locked tokens under active delegation cannot move—preserving reward integrity and preventing double-claims.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 580,
+          "end": 584
+        }
+      ],
+      "title": "",
+      "id": "71726",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "`_update(to, tokenId, auth)` is an **ERC-721** hook overriding parent logic. It injects custom steps before any transfer, mint, or burn\t6ensuring protocol invariants at every token movement.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 730,
+          "end": 738
+        }
+      ],
+      "title": "",
+      "id": "71727",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "**Step 1: canTransfer** → reverts with `TokenLocked` if delegation is active. This prevents moving a position that’s still earning delegated rewards.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 739,
+          "end": 741
+        }
+      ],
+      "title": "",
+      "id": "71728",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "**Step 2: Claim base VTHO** → if `VetGeneratedVtho.claimableRewards() > 0`, automatically call `claimRewards()`. Users never lose pre-Hayabusa VTHO when trading NFTs.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 745,
+          "end": 748
+        }
+      ],
+      "title": "",
+      "id": "71729",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "**Step 3: Claim delegation rewards** → if `stargateDelegation.claimableRewards() > 0`, automatically call `claimRewards()`. This strategy ensures all accrued yield is sent to the sender before the asset changes hands.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 751,
+          "end": 753
+        }
+      ],
+      "title": "",
+      "id": "71730",
+      "hideAreas": []
+    },
+    {
+      "type": "mcq",
+      "description": "The `_update` function (lines 730-760) is executed before any token transfer. What is the primary reason for automatically claiming both base VTHO and delegation rewards within this hook?\n\nOptions:\n\n A). To ensure the sender receives all accrued value before the NFT's ownership is transferred, preventing lost rewards.\n\nB). To reduce the gas cost of the transfer transaction for the new owner.\n\nC). To reset the token's maturity period and reward multipliers for the new owner.\n\nD). To comply with an ERC-721 standard requirement for settling rewards before transfers.\n\n\nCorrect: A). To ensure the sender receives all accrued value before the NFT's ownership is transferred, preventing lost rewards.\n\nExplanation: The correct answer is that rewards are claimed to ensure the sender receives all accrued value. The `_update` hook acts as a checkpoint to settle the token's state before ownership changes. This prevents the sender from losing rewards they have earned. This action increases, not decreases, the gas cost of the transfer. It does not reset maturity, and it is a custom protocol feature, not a requirement of the ERC-721 standard.",
+      "title": "",
+      "id": "71752",
+      "text": "The `_update` function (lines 730-760) is executed before any token transfer. What is the primary reason for automatically claiming both base VTHO and delegation rewards within this hook?",
+      "answers": [
+        "To ensure the sender receives all accrued value before the NFT's ownership is transferred, preventing lost rewards.",
+        "To reduce the gas cost of the transfer transaction for the new owner.",
+        "To reset the token's maturity period and reward multipliers for the new owner.",
+        "To comply with an ERC-721 standard requirement for settling rewards before transfers."
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is that rewards are claimed to ensure the sender receives all accrued value. The `_update` hook acts as a checkpoint to settle the token's state before ownership changes. This prevents the sender from losing rewards they have earned. This action increases, not decreases, the gas cost of the transfer. It does not reset maturity, and it is a custom protocol feature, not a requirement of the ERC-721 standard."
+    },
+    {
+      "type": "highlight",
+      "description": "`initialize(initParams)` sets up the proxy after deployment. The `initializer` modifier ensures one-time execution—preventing reinitialization attacks in upgradeable contracts.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 99,
+          "end": 102
+        }
+      ],
+      "title": "",
+      "id": "71731",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Defensive validations block `zero addresses` for `admin`, `upgrader`, `pauser`, `operator`, `legacy contracts`, and `tokens`—avoiding misconfigurations that could brick the protocol.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 102,
+          "end": 111
+        }
+      ],
+      "title": "",
+      "id": "71732",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Validates non-empty strings (`name`, `symbol`, `URI`) to prevent broken metadata, then enforces `legacyLastTokenId > 0` and non-empty `levels array`—ensuring a sound launch state.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 115,
+          "end": 120
+        }
+      ],
+      "title": "",
+      "id": "71733",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Calls parent initializers for `ERC-721`, `enumerable`, `pausable`, `guard`, `access control`, and `UUPS` modules (lines 134–139), then grants roles: `DEFAULT_ADMIN_ROLE`, `UPGRADER_ROLE`, `PAUSER_ROLE`, `LEVEL_OPERATOR_ROLE`—defining protocol governance and emergency powers.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 134,
+          "end": 145
+        }
+      ],
+      "title": "",
+      "id": "71734",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Storage init hooks levels (lines 150–152) and sets links to legacy `TokenAuction`, `StargateDelegation`, and `vthoToken` (lines 155–159). This stitches the ecosystem together so that NFTs, legacy nodes, and rewards flow correctly.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 147,
+          "end": 153
+        }
+      ],
+      "title": "",
+      "id": "71735",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "`pause()` and `unpause()` let `PAUSER_ROLE` halt all state-changing actions. This emergency brake is used around hardforks (e.g. Hayabusa) to ensure an accurate rewards cut-off and protect users when chain upgrades occur.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 202,
+          "end": 210
+        }
+      ],
+      "title": "",
+      "id": "71736",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Every state-changing public function (`stake`, `unstake`, `migrate`, `claimVetGeneratedVtho`) uses `whenNotPaused`, enforcing the pause guard across the protocol—an **industry best practice** for resilient DeFi systems.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 326,
+          "end": 328
+        }
+      ],
+      "title": "",
+      "id": "71737",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Roles like `PAUSER`, `UPGRADER`, and `LEVEL_OPERATOR` use `keccak256` hashes to avoid collisions and allow future extensibility—enabling fine-grained, upgradeable access control.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 67,
+          "end": 70
+        }
+      ],
+      "title": "",
+      "id": "71738",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "**Why this design?** Modular libraries are used to reduce contract size, improve reusability, and optimize gas. A centralized storage `struct` facilitates `UUPS` upgrades. Automatic reward claims and transfer locks are implemented to prevent yield loss during trades. Emergency pause and role-based governance are included for security and risk management in `DeFi` environments.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 35,
+          "end": 56
+        }
+      ],
+      "title": "",
+      "id": "71739",
+      "hideAreas": []
+    }
+  ]
+}

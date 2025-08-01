@@ -1,0 +1,255 @@
+{
+  "title": "2.1: StargateNFT: Overview",
+  "id": "V2MApsi/gHYjdvN0olc/topkAEcin5x5+foRyoBKnxw=",
+  "originalId": 5705,
+  "position": 2,
+  "steps": [
+    {
+      "type": "textOnly",
+      "description": "Welcome to the `StargateNFT` walkthrough! This tour explores why and how `StargateNFT` brings liquid staking to `VeChain` by minting `NFTs` for exact `VET` deposits, preserving legacy `X-Node` history, and delivering on-chain `VTHO` rewards with delegation support.",
+      "title": "",
+      "id": "71695"
+    },
+    {
+      "type": "highlight",
+      "description": "`StargateNFT.sol` orchestrates the entire system: it stakes exact VET amounts (line 47), enforces maturity periods for rewards (line 48), and migrates legacy X-Nodes by preserving their token IDs (lines 39–44).",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 35,
+          "end": 44
+        }
+      ],
+      "title": "",
+      "id": "71696",
+      "hideAreas": []
+    },
+    {
+      "type": "textOnly",
+      "description": "The `contract` offloads logic to eight `library` modules deployed once and called via `DELEGATECALL`, enabling gas-efficient code reuse and separation of concerns while keeping the main `contract` upgradeable.",
+      "title": "",
+      "id": "71697"
+    },
+    {
+      "type": "textOnly",
+      "description": "For example, staking and migration logic are invoked through `library` calls, keeping the main contract lean and focused.",
+      "title": "",
+      "id": "71699"
+    },
+    {
+      "type": "highlight",
+      "description": "Delegating the staking logic.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 326,
+          "end": 332
+        }
+      ],
+      "title": "",
+      "id": "71700",
+      "hideAreas": []
+    },
+    {
+      "type": "textOnly",
+      "description": "Base VTHO reward claims also use a `library call` to calculate, update, and transfer rewards in one transaction.",
+      "title": "",
+      "id": "71701"
+    },
+    {
+      "type": "highlight",
+      "description": "This function delegates its logic to the `VetGeneratedVtho` library.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 381,
+          "end": 386
+        }
+      ],
+      "title": "",
+      "id": "71702",
+      "hideAreas": []
+    },
+    {
+      "type": "mcq",
+      "description": "`StargateNFT.sol` delegates logic to stateless libraries like `MintingLogic.sol`. From an architectural standpoint, what is the key implication of using this pattern with `DELEGATECALL`?\n\nOptions:\n\n A). The library code executes within the context of StargateNFT.sol, directly modifying its storage, which maintains a single state context while separating logical concerns.\n\nB). It creates a secure boundary where each library operates on its own storage and interacts with StargateNFT.sol only through external calls.\n\nC). It allows both the main StargateNFT.sol contract and the individual libraries to be upgraded independently for maximum flexibility.\n\nD). It is a form of syntactic sugar for multiple inheritance, bundling all code into a single contract at compile time to simplify state variable access.\n\n\nCorrect: A). The library code executes within the context of StargateNFT.sol, directly modifying its storage, which maintains a single state context while separating logical concerns.\n\nExplanation: That's right. The key feature of this pattern is that libraries are stateless and their code is executed in the context of the calling contract via `DELEGATECALL`. This means `MintingLogic` operates directly on `StargateNFT`'s storage. This approach allows for logical separation and code reuse without the gas overhead or complexity of managing state across multiple, distinct contracts. The other options describe different architectural patterns.",
+      "title": "",
+      "id": "71716",
+      "text": "`StargateNFT.sol` delegates logic to stateless libraries like `MintingLogic.sol`. From an architectural standpoint, what is the key implication of using this pattern with `DELEGATECALL`?",
+      "answers": [
+        "The library code executes within the context of StargateNFT.sol, directly modifying its storage, which maintains a single state context while separating logical concerns.",
+        "It creates a secure boundary where each library operates on its own storage and interacts with StargateNFT.sol only through external calls.",
+        "It allows both the main StargateNFT.sol contract and the individual libraries to be upgraded independently for maximum flexibility.",
+        "It is a form of syntactic sugar for multiple inheritance, bundling all code into a single contract at compile time to simplify state variable access."
+      ],
+      "correct": 0,
+      "explanation": "That's right. The key feature of this pattern is that libraries are stateless and their code is executed in the context of the calling contract via `DELEGATECALL`. This means `MintingLogic` operates directly on `StargateNFT`'s storage. This approach allows for logical separation and code reuse without the gas overhead or complexity of managing state across multiple, distinct contracts. The other options describe different architectural patterns."
+    },
+    {
+      "type": "textOnly",
+      "description": "Under the hood, `DataTypes` defines storage layouts, `Levels` manages supply checkpoints, and `Clock` feeds timing into both reward and supply logic.",
+      "title": "",
+      "id": "71703"
+    },
+    {
+      "type": "highlight",
+      "description": "This struct holds all the state variables for the `StargateNFT` contract.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
+      "highlight": [
+        {
+          "start": 24,
+          "end": 37
+        }
+      ],
+      "title": "",
+      "id": "71704",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "This library defines key data structures, such as the `Level` struct, which holds the properties for each NFT tier.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
+      "highlight": [
+        {
+          "start": 54,
+          "end": 61
+        }
+      ],
+      "title": "",
+      "id": "71705",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "This is `Levels.sol`, which manages NFT tiers, dynamically adds or updates levels, and uses `OpenZeppelin’s Checkpoints` to track historical circulating supply for caps and reward eligibility.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Levels.sol",
+      "highlight": [
+        {
+          "start": 19,
+          "end": 23
+        }
+      ],
+      "title": "",
+      "id": "71706",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "This is `MintingLogic.sol`, which implements staking, migration, and unstaking flows with a cap-preservation strategy that keeps legacy token IDs intact while controlling new mints.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/MintingLogic.sol",
+      "highlight": [
+        {
+          "start": 22,
+          "end": 24
+        }
+      ],
+      "title": "",
+      "id": "71707",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "This is `VetGeneratedVtho.sol`, which calculates and distributes base VTHO rewards using VeChain’s formula of 5×10⁻⁹ VTHO per VET per second and updates claim timestamps.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/VetGeneratedVtho.sol",
+      "highlight": [
+        {
+          "start": 22,
+          "end": 26
+        }
+      ],
+      "title": "",
+      "id": "71708",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "This is `Clock.sol`, which provides `_clock()` for block numbers and `_timestamp()` for Unix timestamps, separating supply snapshot timing from reward calculations.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Clock.sol",
+      "highlight": [
+        {
+          "start": 20,
+          "end": 24
+        }
+      ],
+      "title": "",
+      "id": "71709",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "This is `Errors.sol`, which centralizes custom error definitions for revert messages and consistent failure semantics across all modules.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Errors.sol",
+      "highlight": [
+        {
+          "start": 14,
+          "end": 17
+        }
+      ],
+      "title": "",
+      "id": "71710",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "This is `Settings.sol`, which manages updatable parameters—contract addresses, base URIs, and VTHO generation end timestamps—under role-based security controls.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Settings.sol",
+      "highlight": [
+        {
+          "start": 22,
+          "end": 24
+        }
+      ],
+      "title": "",
+      "id": "71711",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "This is `Token.sol`, which extends `ERC721` with maturity checks, owner enumerations, and legacy X-token identification for advanced portfolio queries.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/Token.sol",
+      "highlight": [
+        {
+          "start": 20,
+          "end": 24
+        }
+      ],
+      "title": "",
+      "id": "71712",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The contract inherits from `AccessControlUpgradeable` (role-based permissions), `ERC721EnumerableUpgradeable` (token enumeration), `ERC721PausableUpgradeable` (emergency pause), `ReentrancyGuardUpgradeable` (reentrancy protection), and `UUPSUpgradeable` (proxy upgrades).",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 57,
+          "end": 65
+        }
+      ],
+      "title": "",
+      "id": "71713",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Role constants: `UPGRADER_ROLE` for upgrades, `PAUSER_ROLE` for pauses, `LEVEL_OPERATOR_ROLE` for tier management, and `MANAGER_ROLE` for metadata control.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 66,
+          "end": 71
+        }
+      ],
+      "title": "",
+      "id": "71714",
+      "hideAreas": []
+    },
+    {
+      "type": "textOnly",
+      "description": "This completes our high-level overview. Next, we’ll dive into each library’s implementation to see how `DataTypes`, `Levels`, `MintingLogic`, `VetGeneratedVtho`, `Clock`, `Errors`, `Settings`, and `Token` interconnect and power the full staking lifecycle on VeChain.",
+      "title": "",
+      "id": "71715"
+    }
+  ]
+}

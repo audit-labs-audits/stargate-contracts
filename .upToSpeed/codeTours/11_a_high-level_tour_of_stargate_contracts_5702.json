@@ -1,0 +1,217 @@
+{
+  "title": "1.1: A High-Level Tour of Stargate Contracts",
+  "id": "OU/NpNEvncRLy26g92uffYtfx4SLXSFg7KmvmJz3Jg4=",
+  "originalId": 5702,
+  "position": 1,
+  "steps": [
+    {
+      "type": "textOnly",
+      "description": "Welcome to a comprehensive walkthrough of the Stargate codebase architecture.\n\nThis tour guides you through the main components of the system, their primary responsibilities, and how they work together. It covers both the individual pieces and the architectural decisions that make this system upgradeable.",
+      "title": "",
+      "id": "71646"
+    },
+    {
+      "type": "highlight",
+      "description": "The system's foundation is the **proxy pattern**. The `StargateProxy` implements the `ERC1967` upgradeable proxy standard. When users call functions on this contract, it doesn't execute the logic itself - instead, it delegates all calls to an implementation contract stored at a specific storage slot.",
+      "file": "packages/contracts/contracts/StargateProxy.sol",
+      "highlight": [
+        {
+          "start": 12,
+          "end": 16
+        }
+      ],
+      "title": "",
+      "id": "71647",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "This `_implementation()` function shows how the proxy retrieves the current implementation address. This pattern allows the system to upgrade its logic while keeping the same entry point address. Users and other protocols can always interact with the same contract address, even as the underlying functionality evolves.",
+      "file": "packages/contracts/contracts/StargateProxy.sol",
+      "highlight": [
+        {
+          "start": 41,
+          "end": 49
+        }
+      ],
+      "title": "",
+      "id": "71648",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "`StargateNFT` is the core implementation contract that the proxy delegates to. It represents a fundamental shift in **VeChain**'s node system: users now **hard stake** their VET directly into the contract (rather than soft staking in wallets), and each NFT represents a permanent, non-upgradeable staking position.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 35,
+          "end": 42
+        }
+      ],
+      "title": "",
+      "id": "71649",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The contract's inheritance structure reveals its capabilities. Beyond standard `ERC721` functionality, it includes `pausability` for emergency stops, `access control` for administrative functions, and `reentrancy protection` for secure financial operations. This design supports the high-value, long-term nature of staking positions.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 57,
+          "end": 65
+        }
+      ],
+      "title": "",
+      "id": "71650",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Now let's explore the **VeChain economic model** that powers the reward system. VeChain operates on a dual-token model: `VET` (the primary token) automatically generates `VTHO` (the gas token) over time. This formula shows the official generation rate implemented in the system.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 614,
+          "end": 617
+        }
+      ],
+      "title": "",
+      "id": "71651",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "**Source 1: Base VTHO Generation.** The `calculateVTHO` function implements VeChain's official generation rate. This means every `VET` token generates 0.000432 `VTHO` per day. When users stake `VET` to mint NFTs, their staked `VET` continues generating `VTHO`, which they can claim as rewards.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/VetGeneratedVtho.sol",
+      "highlight": [
+        {
+          "start": 123,
+          "end": 140
+        }
+      ],
+      "title": "",
+      "id": "71652",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "**Source 2: Delegation Rewards.** This separate contract provides **additional** **VTHO** rewards funded by the **VeChain Foundation**. The term \"delegation\" refers to the upcoming Hayabusa hardfork, where users will delegate staked **VET** to validators. This contract simulates that process, allowing users to earn extra rewards while their NFTs remain locked.",
+      "file": "packages/contracts/contracts/StargateDelegation/StargateDelegation.sol",
+      "highlight": [
+        {
+          "start": 23,
+          "end": 31
+        }
+      ],
+      "title": "",
+      "id": "71653",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "A critical design decision was to **automatically claim all rewards** before any `NFT transfer`. This prevents users from losing accumulated rewards when trading NFTs - a common problem in `staking systems` where rewards can be \"stuck\" with transferred tokens.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 723,
+          "end": 726
+        }
+      ],
+      "title": "",
+      "id": "71654",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The `_update` function runs before every NFT transfer, mint, or burn. It automatically claims rewards from **both sources** - base VTHO generation and delegation rewards. This ensures the current owner receives all their earned rewards before the NFT changes hands, eliminating the risk of reward loss during trading.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 743,
+          "end": 753
+        }
+      ],
+      "title": "",
+      "id": "71655",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The final architectural piece addresses a **compatibility challenge**: VeChain has legacy nodes from the old `TokenAuction` contract alongside new `StargateNFT`s. `NodeManagementV3` solves this by providing a unified abstraction layer. Instead of protocols having to check multiple contracts and handle different interfaces, they can use this single contract to query node ownership and delegation status across both legacy and new systems.",
+      "file": "packages/contracts/contracts/NodeManagement/NodeManagementV3.sol",
+      "highlight": [
+        {
+          "start": 28,
+          "end": 31
+        }
+      ],
+      "title": "",
+      "id": "71656",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Here's how the abstraction works in practice. The `getNodeManager` function first checks if a node has been manually delegated to another address. If not, it calls `getNodeOwner` to find the actual owner. This handles the common case where protocols need to know \"who can act on behalf of this node?\"",
+      "file": "packages/contracts/contracts/NodeManagement/NodeManagementV3.sol",
+      "highlight": [
+        {
+          "start": 252,
+          "end": 267
+        }
+      ],
+      "title": "",
+      "id": "71657",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The `getNodeOwner` function demonstrates the cross-system compatibility. It checks **both** the legacy `vechainNodesContract` (line 284) and the new `stargateNft` contract (line 287). A protocol like **VeBetterDAO** can call this single function and get the owner regardless of which system the node exists in.",
+      "file": "packages/contracts/contracts/NodeManagement/NodeManagementV3.sol",
+      "highlight": [
+        {
+          "start": 276,
+          "end": 288
+        }
+      ],
+      "title": "",
+      "id": "71658",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "**Example Usage Scenario**: Imagine a DeFi protocol that wants to give special privileges to VeChain node holders. Instead of integrating with multiple node contracts and handling different interfaces, they simply call `isNodeManager(userAddress, nodeId)` to check if a user controls a specific node, whether it's a legacy auction node or a new Stargate NFT.",
+      "file": "packages/contracts/contracts/NodeManagement/NodeManagementV3.sol",
+      "highlight": [
+        {
+          "start": 368,
+          "end": 378
+        }
+      ],
+      "title": "",
+      "id": "71659",
+      "hideAreas": []
+    },
+    {
+      "type": "mcq",
+      "description": "A third-party protocol needs to verify if a user is the manager of a VeChain node, regardless of whether it's a legacy `TokenAuction` node or a new `StargateNFT`. Which contract is designed to provide a single, unified interface for this purpose?\n\nOptions:\n\n A). StargateNFT\n\nB). StargateProxy\n\nC). NodeManagementV3\n\nD). StargateDelegation\n\n\nCorrect: C). NodeManagementV3\n\nExplanation: The correct answer is `NodeManagementV3`. Its primary purpose is to act as an abstraction layer, providing functions like `getNodeManager` and `getNodeOwner` that check for ownership across both the legacy `vechainNodesContract` and the new `stargateNft` contract. Using `StargateNFT` directly would miss legacy nodes, `StargateProxy` is the system's entry point but doesn't handle this specific abstraction, and `StargateDelegation` is for managing bonus rewards, not ownership queries.",
+      "title": "",
+      "id": "71676",
+      "text": "A third-party protocol needs to verify if a user is the manager of a VeChain node, regardless of whether it's a legacy `TokenAuction` node or a new `StargateNFT`. Which contract is designed to provide a single, unified interface for this purpose?",
+      "answers": [
+        "StargateNFT",
+        "StargateProxy",
+        "NodeManagementV3",
+        "StargateDelegation"
+      ],
+      "correct": 2,
+      "explanation": "The correct answer is `NodeManagementV3`. Its primary purpose is to act as an abstraction layer, providing functions like `getNodeManager` and `getNodeOwner` that check for ownership across both the legacy `vechainNodesContract` and the new `stargateNft` contract. Using `StargateNFT` directly would miss legacy nodes, `StargateProxy` is the system's entry point but doesn't handle this specific abstraction, and `StargateDelegation` is for managing bonus rewards, not ownership queries."
+    },
+    {
+      "type": "textOnly",
+      "description": "**System Architecture Summary**:\n\n* `StargateProxy`: Upgradeable entry point using the proxy pattern - allows logic updates without changing the main contract address\n* `StargateNFT`: Core implementation handling VET staking and NFT lifecycle - supports the new hard-staking model\n* `VetGeneratedVtho` + `StargateDelegation`: Dual reward system leveraging VeChain's native VTHO generation plus Foundation-funded bonuses\n* `NodeManagementV3`: Compatibility layer providing unified access to both legacy and new node systems\n\nThis architecture enables **independent evolution** - each component can be upgraded through the proxy pattern while maintaining backward compatibility and a consistent interface for external protocols.",
+      "title": "",
+      "id": "71660"
+    }
+  ]
+}

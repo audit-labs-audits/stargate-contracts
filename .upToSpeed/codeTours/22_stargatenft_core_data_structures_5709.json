@@ -1,0 +1,103 @@
+{
+  "title": "2.2: StargateNFT: Core Data Structures",
+  "id": "XTVV2C77lIOOcVpCEIqUD819X4BPIyC8sASH8971XqY=",
+  "originalId": 5709,
+  "position": 3,
+  "steps": [
+    {
+      "type": "revealFiles",
+      "files": [
+        "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol"
+      ],
+      "description": "The core data structures for the StargateNFT contract are defined in `DataTypes.sol`. Let's start by examining the main storage struct, **StargateNFTStorage**.",
+      "title": "",
+      "id": "71597",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The `StargateNFTStorage` struct holds the state for the entire contract. This is a common pattern in upgradeable contracts (known as the **Diamond Storage pattern**) to avoid storage collisions between different facets (implementations).\n\nHere's a breakdown of its fields:\n- `vthoGenerationEndTimestamp`: A `uint48` that stores the timestamp when VTHO generation for staked VET will cease.\n- `MAX_LEVEL_ID`: A `uint8` indicating the highest possible level ID for an NFT.\n- `legacyNodes`: An `ITokenAuction` interface, pointing to the legacy node contract for migration purposes.\n- `stargateDelegation`: An `IStargateDelegation` interface, pointing to the contract that handles delegation and rewards.\n- `vthoToken`: An `IERC20` interface for the VTHO token contract.\n- `currentTokenId`: A `uint256` that tracks the next available token ID to be minted.\n- `baseTokenURI`: A `string` that forms the base for the metadata URI of each NFT.\n- `levels`: A mapping from a `uint8` level ID to a `Level` struct, containing details about each NFT level.\n- `circulatingSupply`: A mapping from a `uint8` level ID to `Checkpoints.Trace208`, which tracks the historical circulating supply of NFTs for that level.\n- `cap`: A mapping from a `uint8` level ID to a `uint32`, defining the maximum number of NFTs that can exist at that level.\n- `tokens`: A mapping from a `uint256` token ID to a `Token` struct, holding the data for each individual NFT.\n- `maturityPeriodEndBlock`: A mapping from a `uint256` token ID to a `uint64`, storing the block number at which the NFT's maturity period ends.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
+      "highlight": [
+        {
+          "start": 24,
+          "end": 37
+        }
+      ],
+      "title": "",
+      "id": "71598",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The `Level` struct defines the properties of each NFT level.\n\n- `name`: The name of the level (e.g., \"Thunder\").\n- `isX`: A boolean indicating if the level corresponds to an X-Node.\n- `id`: The unique identifier for the level.\n- `maturityBlocks`: The number of blocks an NFT of this level must wait before it can start earning delegation rewards.\n- `scaledRewardFactor`: A reward multiplier for the level, scaled by 100 (e.g., a 1.5x multiplier is stored as 150).\n- `vetAmountRequiredToStake`: The amount of VET required to mint an NFT of this level.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
+      "highlight": [
+        {
+          "start": 54,
+          "end": 61
+        }
+      ],
+      "title": "",
+      "id": "71599",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "The `Token` struct stores the data for each individual `StargateNFT`. It tracks the unique `tokenId`, the `levelId` it belongs to, the `mintedAtBlock`, the `vetAmountStaked` to create it, and the `lastVthoClaimTimestamp` for reward tracking.",
+      "file": "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
+      "highlight": [
+        {
+          "start": 69,
+          "end": 75
+        }
+      ],
+      "title": "",
+      "id": "71600",
+      "hideAreas": []
+    },
+    {
+      "type": "mcq",
+      "description": "To retrieve the `scaledRewardFactor` for a specific NFT with a known `tokenId`, what is the correct data access path within the `StargateNFTStorage` struct ($)?\n\nOptions:\n\n A). $.tokens[tokenId].scaledRewardFactor\n\nB). $.levels[tokenId].scaledRewardFactor\n\nC). $.levels[$.tokens[tokenId].levelId].scaledRewardFactor\n\nD). $.circulatingSupply[$.tokens[tokenId].levelId].scaledRewardFactor\n\n\nCorrect: C). $.levels[$.tokens[tokenId].levelId].scaledRewardFactor\n\nExplanation: The correct path is `$.levels[$.tokens[tokenId].levelId].scaledRewardFactor`. First, the `Token` struct is retrieved from the `tokens` mapping using the `tokenId`. This struct contains the `levelId`. Second, the `Level` struct is retrieved from the `levels` mapping using this `levelId`. The `Level` struct contains the `scaledRewardFactor`. The other options are incorrect because `Token` does not directly store `scaledRewardFactor`, `levels` is keyed by `levelId` not `tokenId`, and `circulatingSupply` tracks supply, not level properties.",
+      "title": "",
+      "id": "71604",
+      "text": "To retrieve the `scaledRewardFactor` for a specific NFT with a known `tokenId`, what is the correct data access path within the `StargateNFTStorage` struct ($)?",
+      "answers": [
+        "$.tokens[tokenId].scaledRewardFactor",
+        "$.levels[tokenId].scaledRewardFactor",
+        "$.levels[$.tokens[tokenId].levelId].scaledRewardFactor",
+        "$.circulatingSupply[$.tokens[tokenId].levelId].scaledRewardFactor"
+      ],
+      "correct": 2,
+      "explanation": "The correct path is `$.levels[$.tokens[tokenId].levelId].scaledRewardFactor`. First, the `Token` struct is retrieved from the `tokens` mapping using the `tokenId`. This struct contains the `levelId`. Second, the `Level` struct is retrieved from the `levels` mapping using this `levelId`. The `Level` struct contains the `scaledRewardFactor`. The other options are incorrect because `Token` does not directly store `scaledRewardFactor`, `levels` is keyed by `levelId` not `tokenId`, and `circulatingSupply` tracks supply, not level properties."
+    },
+    {
+      "type": "highlight",
+      "description": "To manage contract state, `StargateNFT.sol` uses a storage pointer. The `_getStargateNFTStorage` function retrieves a pointer to the `StargateNFTStorage` struct located at a specific storage slot, `StargateNFTStorageLocation`. This constant is a hash that uniquely identifies the storage for this contract, preventing conflicts with other contracts in the **diamond pattern**.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 79,
+          "end": 91
+        }
+      ],
+      "title": "",
+      "id": "71601",
+      "hideAreas": []
+    },
+    {
+      "type": "highlight",
+      "description": "Here's an example of how the storage pointer is used within the `initialize` function. It gets the storage pointer and then populates the fields of the `StargateNFTStorage` struct with the initial parameters, such as contract addresses and the starting `currentTokenId`. This same pattern is used throughout the contract to read from and write to the contract's state.",
+      "file": "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+      "highlight": [
+        {
+          "start": 147,
+          "end": 160
+        }
+      ],
+      "title": "",
+      "id": "71602",
+      "hideAreas": []
+    }
+  ]
+}

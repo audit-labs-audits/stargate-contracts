@@ -1,0 +1,32 @@
+{
+  "packageName": "vechain-stargate-contracts",
+  "packageVersion": 1,
+  "hash": "7eadf783a397fb901bf974485f107d9a213385cf",
+  "numberOfTours": 8,
+  "titleOfTours": [
+    "1.1: A High-Level Tour of Stargate Contracts",
+    "2.1: StargateNFT: Overview",
+    "2.2: StargateNFT: Core Data Structures",
+    "2.3: StargateNFT: NFT Levels",
+    "3.2: StargateNFT: VTHO Rewards",
+    "3.3: StargateNFT: The Main Contract",
+    "3.4: StargateNFT: Utilities",
+    "4.1: Want to learn more?"
+  ],
+  "totalNumberOfSteps": 106,
+  "filesCovered": [
+    "packages/contracts/contracts/StargateProxy.sol",
+    "packages/contracts/contracts/StargateNFT/StargateNFT.sol",
+    "packages/contracts/contracts/StargateNFT/libraries/VetGeneratedVtho.sol",
+    "packages/contracts/contracts/StargateDelegation/StargateDelegation.sol",
+    "packages/contracts/contracts/NodeManagement/NodeManagementV3.sol",
+    "packages/contracts/contracts/StargateNFT/libraries/DataTypes.sol",
+    "packages/contracts/contracts/StargateNFT/libraries/Levels.sol",
+    "packages/contracts/contracts/StargateNFT/libraries/MintingLogic.sol",
+    "packages/contracts/contracts/StargateNFT/libraries/Clock.sol",
+    "packages/contracts/contracts/StargateNFT/libraries/Errors.sol",
+    "packages/contracts/contracts/StargateNFT/libraries/Settings.sol",
+    "packages/contracts/contracts/StargateNFT/libraries/Token.sol"
+  ],
+  "numberOfFilesCovered": 12
+}
